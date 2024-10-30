@@ -13,7 +13,7 @@ export default function Register() {
 
     const submitRegister = async (values) => {
         try {
-            const response = await axiosRequest({ method: 'POST', url: `${apiUrl}/api/auth/register`, headers: { 'Content-Type': 'application/json' }, data: JSON.stringify(values) });
+            const response = await axiosRequest({ method: 'POST', url: `${apiUrl}/api/auth/register/`, headers: { 'Content-Type': 'application/json' }, data: JSON.stringify(values) });
             if (response) {
                 updateUser(response);
                 navigate('/', { replace: true });
