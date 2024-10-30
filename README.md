@@ -6,12 +6,12 @@ Bienvenue dans le projet pour ORTHiN3D ! Ce projet est une application qui perme
 
 Avant de commencer, assurez-vous d'avoir installé les éléments suivants :
 
-- [Node.js](https://nodejs.org/) (version 14 ou supérieure)
-- [Python](https://www.python.org/) (version 3.8 ou supérieure)
-- [npm](https://www.npmjs.com/) (installé avec Node.js)
-- [Django](https://www.djangoproject.com/) (version 3.2 ou supérieure)
-- [Django REST Framework](https://www.django-rest-framework.org/) pour l'API backend
-- [React](https://reactjs.org/) pour le frontend
+- [Node.js](https://nodejs.org/)
+- [Python](https://www.python.org/)
+- [npm](https://www.npmjs.com/)
+- [Django](https://www.djangoproject.com/)
+- [Django REST Framework](https://www.django-rest-framework.org/)
+- [React](https://reactjs.org/)
 
 ## Structure du Projet
 

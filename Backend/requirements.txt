@@ -1,0 +1,14 @@
+# Django framework
+Django==5.1.2
+
+# Django REST framework for building REST APIs
+djangorestframework==3.14.0
+
+# JWT authentication for secure token-based access
+djangorestframework-simplejwt==5.2.2
+
+# CORS headers for cross-origin resource sharing with frontend
+django-cors-headers==3.13.0
+
+# Optional: For managing environment variables
+python-dotenv==1.0.0
