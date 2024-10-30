@@ -16,14 +16,14 @@ export default function Home() {
     }
 
     function allCV() {
-        navigate("/liste-cv");
+        navigate("/record-list");
     }
 
     return (
         <BackgroundGradientAnimation>
             <div className="relative z-10 w-full h-full flex flex-col items-center justify-center text-white font-bold px-4 text-3xl text-center md:text-4xl lg:text-7xl">
                 <p className="bg-clip-text text-transparent drop-shadow-2xl bg-gradient-to-b from-white/80 to-white/20 py-8 md:py-12">
-                    Chaque CV a une histoire à raconter.<br /> Aidez-le à trouver son auditoire sur <b>ProLinker</b>
+                Chaque dossier de santé est un parcours de vie.<br /> Offrez-lui la sécurité et la précision qu’il mérite avec <b className="text-pink-600">ORTHOiN3D</b>.
                 </p>
             </div>
             {!user ? (
@@ -38,7 +38,7 @@ export default function Home() {
             ) : (
                 <div className="absolute z-50 flex space-x-6 mt-12" style={{ top: '70%', left: '50%', transform: 'translate(-50%, -50%)' }}>
                     <button onClick={allCV} className="bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1">
-                        Découvrir les CVs
+                        Découvrir les enregistrements
                     </button>
                 </div>
             )}

@@ -3,6 +3,7 @@ import axios from 'axios';
 export const axiosRequest = async ({ method, url, setStateFunction = null, data = null, headers = null, suppressErrorLog = false, liked = null }) => {
     try {
         const config = { method, url, headers, data };
+        console.log(config)
         const response = await axios(config);
         if (liked !== null) {
             const transformedData = response.data.reduce((acc, el) => { acc[el._id] = true; return acc; }, {});

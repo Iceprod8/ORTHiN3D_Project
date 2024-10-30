@@ -1,97 +1,91 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, useContext } from 'react';
+import { axiosRequest } from '../libs/apiUtils';
+import { UserContext } from '../context/userContext';
 
-const RecordList = () => {
-    const [records, setRecords] = useState([]), [text, setText] = useState("");
-    const [editMode, setEditMode] = useState(null), [editText, setEditText] = useState("");
+export default function ListeEnregistrements() {
+    const [enregistrements, setEnregistrements] = useState([]), [texte, setTexte] = useState("");
+    const [modeEdition, setModeEdition] = useState(null), [texteEdition, setTexteEdition] = useState("");
+    const { user } = useContext(UserContext);
+    const apiUrl = process.env.REACT_APP_API_URL;
 
-    useEffect(() => { 
-        axios.get('http://127.0.0.1:8000/api/records/')
-            .then(res => setRecords(res.data))
-            .catch(err => console.error("Erreur de récupération", err));
+    useEffect(() => {
+        axiosRequest({ method: 'GET', url: `${apiUrl}/api/records/`, headers: { "Authorization": `${user.access ? `Bearer ${user.access}` : ''}` }, setStateFunction: setEnregistrements });
     }, []);
 
-    const addRecord = async () => { 
-        if (text.trim() === "") return;
-        try { 
-            const res = await axios.post('http://127.0.0.1:8000/api/records/', { text });
-            setRecords([...records, res.data]); 
-            setText(""); 
-        } catch (err) { 
-            console.error("Erreur d'ajout", err); 
+    const ajouterEnregistrement = async () => {
+        if (!texte.trim()) return;
+        const newRecord = await axiosRequest({ method: 'POST', url: `${apiUrl}/api/records/`, headers: { "Authorization": `${user.access ? `Bearer ${user.access}` : ''}` }, data: { text: texte }, setStateFunction: (data) => setEnregistrements([...enregistrements, data])});
+        if (newRecord) setTexte("");
+    };
+
+    const sauvegarderEdition = async (id) => {
+        if (!texteEdition.trim()) return;
+        const updatedRecord = await axiosRequest({ method: 'PUT', url: `${apiUrl}/api/records/${id}/`, headers: { "Authorization": `${user.access ? `Bearer ${user.access}` : ''}` }, data: { text: texteEdition }});
+        if (updatedRecord) {
+            setEnregistrements(enregistrements.map(enr => enr.id === id ? { ...enr, text: texteEdition } : enr));
+            setModeEdition(null);
+            setTexteEdition("");
         }
     };
 
-    const saveEdit = async (id) => {
-        if (editText.trim() === "") return;
-        try {
-            await axios.put(`http://127.0.0.1:8000/api/records/${id}/`, { text: editText });
-            setRecords(records.map(record => record.id === id ? { ...record, text: editText } : record));
-            setEditMode(null); 
-            setEditText("");
-        } catch (err) {
-            console.error("Erreur de mise à jour", err);
-        }
+    const supprimerEnregistrement = async (id) => {
+        const deleted = await axiosRequest({ method: 'DELETE', url: `${apiUrl}/api/records/${id}/`, headers: { "Authorization": `${user.access ? `Bearer ${user.access}` : ''}` }});
+        if (deleted) setEnregistrements(enregistrements.filter(enr => enr.id !== id));
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center bg-gray-100 py-10">
-            <h1 className="text-4xl font-extrabold mb-8 text-gray-800">Records</h1>
-            <div className="w-full max-w-lg flex gap-2 mb-6">
-                <input 
-                    type="text" 
-                    value={text} 
-                    onChange={e => setText(e.target.value)} 
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Add a new record..."
+        <div className="min-h-screen w-full flex flex-col items-center bg-gray-900 py-10">
+            <h1 className="text-5xl font-extrabold mb-10 text-blue-400">Enregistrements</h1>
+            <div className="w-full max-w-2xl flex gap-3 mb-8">
+                <input
+                    type="text"
+                    value={texte}
+                    onChange={e => setTexte(e.target.value)}
+                    placeholder="Ajouter un enregistrement..."
+                    className="w-full px-5 py-3 border border-gray-600 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-800 text-white placeholder-gray-400"
                 />
-                <button 
-                    onClick={addRecord} 
-                    className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                    Add
+                <button onClick={ajouterEnregistrement} className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    Ajouter
                 </button>
             </div>
-            <ul className="w-full max-w-lg space-y-4">
-                {records.map(record => (
-                    <li key={record.id} className="flex items-center bg-white shadow-lg rounded-lg p-4 space-x-4">
-                        {editMode === record.id ? (
-                            <>
-                                <input 
-                                    type="text" 
-                                    value={editText} 
-                                    onChange={e => setEditText(e.target.value)} 
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <ul className="w-full max-w-2xl space-y-4">
+                {enregistrements.map(enr => (
+                    <li key={enr.id} className="flex flex-col bg-gray-800 shadow-md rounded-lg p-4 border border-gray-700 transition hover:shadow-lg">
+                        <div className="flex items-center justify-between">
+                            <div className="flex-1 text-gray-300 text-lg font-medium">{enr.text}</div>
+                            <div className="flex space-x-2">
+                                <button onClick={() => { setModeEdition(enr.id); setTexteEdition(enr.text); }} className="px-4 py-2 bg-yellow-500 text-white font-semibold rounded-lg shadow hover:bg-yellow-600 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                                    Éditer
+                                </button>
+                                <button onClick={() => supprimerEnregistrement(enr.id)} className="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow hover:bg-red-600 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-400">
+                                    Supprimer
+                                </button>
+                            </div>
+                        </div>
+                        <div className="text-sm text-gray-500 mt-2">
+                            Par {enr.created_by} le {enr.created_at}
+                        </div>
+                        {modeEdition === enr.id && (
+                            <div className="mt-4">
+                                <input
+                                    type="text"
+                                    value={texteEdition}
+                                    onChange={e => setTexteEdition(e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-700 text-white mb-3"
                                 />
-                                <button 
-                                    onClick={() => saveEdit(record.id)} 
-                                    className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                >
-                                    Save
-                                </button>
-                                <button 
-                                    onClick={() => setEditMode(null)} 
-                                    className="px-4 py-2 bg-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                                >
-                                    Cancel
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                <span className="flex-1 text-gray-700">{record.text}</span>
-                                <button 
-                                    onClick={() => { setEditMode(record.id); setEditText(record.text); }} 
-                                    className="px-4 py-2 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                >
-                                    Edit
-                                </button>
-                            </>
+                                <div className="flex space-x-3">
+                                    <button onClick={() => sauvegarderEdition(enr.id)} className="flex-1 px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400">
+                                        Enregistrer
+                                    </button>
+                                    <button onClick={() => setModeEdition(null)} className="flex-1 px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                                        Annuler
+                                    </button>
+                                </div>
+                            </div>
                         )}
                     </li>
                 ))}
             </ul>
         </div>
     );
-};
-
-export default RecordList;
+}

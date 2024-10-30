@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import React, { useState, useContext } from "react";
 import { Logo, LogoIcon, Sidebar, SidebarBody, SidebarLink } from "./components/ui/sidebar";
-import { IconSettings, IconUserBolt, IconHome, IconLogout, IconListSearch } from "@tabler/icons-react";
+import { IconUserBolt, IconHome, IconLogout, IconListSearch } from "@tabler/icons-react";
 import ProtectedRoute from './context/protectedRoute';
 import { UserContext } from './context/userContext';
 import { cn } from "./libs/utils";
@@ -11,7 +11,6 @@ import Home from './pages/home.js';
 import Register from './pages/register.js';
 import RecordList from './pages/recordList.js';
 import Login from './pages/login.js';
-import Settings from './pages/settings';
 import Error404 from './pages/404.js';
 
 export default function App() {
@@ -23,13 +22,11 @@ export default function App() {
     const linksLog = [
         { label: "Accueil", href: "/", icon: <IconHome className="text-white h-5 w-5" /> },
         { label: "Records", href: "/record-list", icon: <IconListSearch className="text-white h-5 w-5" /> },
-        { label: "Paramètres", href: "/parametres", icon: <IconSettings className="text-white h-5 w-5" /> },
         { label: "Déconnexion", icon: <IconLogout className="text-white h-5 w-5" />, href: "/connexion", func: () => logout() }
     ];
 
     const linksNotLog = [
         { label: "Accueil", href: "/", icon: <IconHome className="text-white h-5 w-5" /> },
-        { label: "Records", href: "/record-list", icon: <IconListSearch className="text-white h-5 w-5" /> },
         { label: "Connexion", href: "/connexion", icon: <IconUserBolt className="text-white h-5 w-5" /> }
     ];
 
@@ -51,7 +48,6 @@ export default function App() {
                     <Route path="/inscription" element={<RedirectIfAuthenticated><Register /></RedirectIfAuthenticated>} />
                     <Route path="/connexion" element={<RedirectIfAuthenticated><Login /></RedirectIfAuthenticated>} />
                     <Route path="/record-list" element={<ProtectedRoute><RecordList /></ProtectedRoute>} />
-                    <Route path="/parametres" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                     <Route path="*" element={<Error404 />} />
                 </Routes>
             </div>
